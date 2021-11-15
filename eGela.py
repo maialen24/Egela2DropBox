@@ -29,20 +29,26 @@ class eGela:
         uria = "https://egela.ehu.eus/login/index.php"
         print("Uria: ")
         print(uria)
+        token='asfadfadzddf'
         headers = {'Host': 'egela.ehu.eus',
                    'Content-Type': 'application/x-www-form-urlencoded', }
-        data = {'username': username.get(),
+        data = {
+                'username': username.get(),
                 'password': password.get()}
         data_encoded = urllib.parse.urlencode(data)
         headers['Content-Length'] = str(len(data_encoded))
-        erantzuna = requests.request(metodoa, uria, headers=headers, data=data_encoded, allow_redirects=False)
+        erantzuna = requests.request(metodoa, uria, headers=headers, data=data_encoded, allow_redirects=True)
         print(metodoa + " " + uria)
         kodea = erantzuna.status_code
         deskribapena = erantzuna.reason
         print(str(kodea) + " " + deskribapena)
         cookiea = ""
         location = ""
+        print('MIRAR AQUI')
+        print(erantzuna.headers)
         for goiburua in erantzuna.headers:
+            if goiburua == 'logintoken':
+                print('YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             print(goiburua + ": " + erantzuna.headers[goiburua])
             if goiburua == "Set-Cookie":
                 cookiea = erantzuna.headers[goiburua].split(";")[0]
@@ -65,7 +71,7 @@ class eGela:
         uria = location
         goiburuak = {'Host': uria.split('/')[2],
                      'Cookie': cookiea}
-        erantzuna = requests.request(metodoa, uria, headers=goiburuak, allow_redirects=False)
+        erantzuna = requests.request(metodoa, uria, headers=goiburuak, allow_redirects=True)
         print(metodoa + " " + uria)
         kodea = erantzuna.status_code
         deskribapena = erantzuna.reason
@@ -94,7 +100,7 @@ class eGela:
                      'Content-Length': str(len(data)), 'Cookie': self._cookiea}
         data_encoded = urllib.parse.urlencode(data)
         goiburuak['Content-Length'] = str(len(data_encoded))
-        erantzuna = requests.request(metodoa, uria, data=data_encoded, headers=goiburuak, allow_redirects=False)
+        erantzuna = requests.request(metodoa, uria, data=data_encoded, headers=goiburuak, allow_redirects=True)
         print(metodoa + " " + uria)
         kodea = erantzuna.status_code
         deskribapena = erantzuna.reason
@@ -137,7 +143,7 @@ class eGela:
             goiburuak = {'Host': 'egela.ehu.eus', 'Content-Type': 'application/x-www-form-urlencoded',
                          'Content-Length': str(len(data)), 'Cookie': self._cookiea}
             uria = "https://egela.ehu.eus/course/view.php?id=42336&section=" + str(section)
-            erantzuna = requests.request(metodoa, uria, data=data, headers=goiburuak, allow_redirects=False)
+            erantzuna = requests.request(metodoa, uria, data=data, headers=goiburuak, allow_redirects=True)
             edukia = erantzuna.content
             status = erantzuna.status_code
             print(status)
