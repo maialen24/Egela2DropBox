@@ -38,7 +38,7 @@ class Dropbox:
         server_socket.listen(1)
         print("\tLocal server listening on port " + str(server_port))
 
-        # nabitzailetik 302 eskaera jaso
+        # nabigatzailetik 302 eskaera jaso
         client_connection, client_address = server_socket.accept()
         eskaera = client_connection.recv(1024)
         print("\tRequest from the browser received at local server:")
@@ -68,27 +68,34 @@ class Dropbox:
         parametroak_encoded = urllib.parse.urlencode(parametroak)
         webbrowser.open(uri + '?' + parametroak_encoded)
         print("/oauth2/authorize")
+
         auth_code = self.local_server()
         print("auth_code: " + auth_code)
+
         uri = "https://api.dropboxapi.com/oauth2/token"
         goiburuak = {'Host': 'api.dropboxapi.com', 'Content-Type': 'application/x-www-form-urlencoded'}
         datuak = {'code': auth_code, 'client_id': app_key, 'client_secret': app_secret, 'redirect_uri': redirect_uri,
                   'grant_type': 'authorization_code'}
+
         erantzuna = requests.post(uri, headers=goiburuak, data=datuak, allow_redirects=False)
         status = erantzuna.status_code
         edukia = erantzuna.text
         edukia_json = json.loads(edukia)
         access_token = edukia_json['access_token']
+
         print("Status: ")
         print(str(status))
+
         print("Edukia: ")
         print(edukia)
+
         print("access_token: ")
         print(access_token)
 
         self._access_token = access_token
         self._root.destroy()
 
+    #Dropbox-eko karpeta pantailaratzeko
     def list_folder(self, msg_listbox):
         print("/list_folder")
         uri = "https://api.dropboxapi.com/2/files/list_folder"
@@ -96,73 +103,101 @@ class Dropbox:
             path = ""
         else:
             path = self._path
+
         datuak = {'path': path, "recursive": False, "include_media_info": False, "include_deleted": False,
                   "include_has_explicit_shared_members": False, "include_mounted_folders": True,
                   "include_non_downloadable_files": True}
+
         datuak_encoded = json.dumps(datuak)
         goiburuak = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + self._access_token,
                      'Content-Type': 'application/json'}
         erantzuna = requests.post(uri, headers=goiburuak, data=datuak_encoded, allow_redirects=False)
         status = erantzuna.status_code
         edukia = erantzuna.text
+
         print("Status: ")
         print(str(status))
+
         print("Edukia: ")
         print(edukia)
         edukia_json_dict = json.loads(edukia)
 
         self._files = helper.update_listbox2(msg_listbox, self._path, edukia_json_dict)
 
+    #Dropbox-era artxiboak sortzeko
     def transfer_file(self, file_path, file_data):
         print("/upload" + file_path)
         uri = "https://content.dropboxapi.com/2/files/upload"
         datuak = {'path': file_path, 'mode': 'add', 'autorename': True, 'mute': False, 'strict_conflict': False}
+
         datuak_json = json.dumps(datuak)
+
         goiburuak = {'Host': 'content.dropboxapi.com', 'Authorization': 'Bearer ' + self._access_token,
                      'Dropbox-API-Arg': datuak_json, 'Content-Type': 'application/octet-stream'}
+
         erantzuna = requests.post(uri, headers=goiburuak, data=file_data, allow_redirects=False)
         status = erantzuna.status_code
+
         print("Status: ")
         print(str(status))
 
+    #Dropbox-en artxibo bat ezabatzeko
     def delete_file(self, file_path):
         print("/delete_file " + file_path)
         uri = 'https://api.dropboxapi.com/2/files/delete'
+
         datuak = {'path': file_path}
+
         datuak_json = json.dumps(datuak)
+
         goiburuak = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + self._access_token,
                      'Content-Type': 'application/json'}
+
         erantzuna = requests.post(uri, headers=goiburuak, data=datuak_json, allow_redirects=False)
         status = erantzuna.status_code
         print("Status: ")
         print(str(status))
 
+    #Dropbox-en karpeta berri bat sortzeko
     def create_folder(self, path):
         print("/create_folder " + str(path))
         uri = 'https://api.dropboxapi.com/2/files/create_folder'
+
         datuak = {'path': path, 'autorename': False}
+
         datuak_json = json.dumps(datuak)
+
         goiburuak = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + self._access_token,
                      'Content-Type': 'application/json'}
+
         erantzuna = requests.post(uri, headers=goiburuak, data=datuak_json, allow_redirects=False)
         status = erantzuna.status_code
         print("Status: ")
         print(str(status))
 
+    #PDF-ak Dropbox-etik deskargatzeko
     def download_pdf(self, file_path):
         print("/download_links " + file_path)
         uria = 'https://api.dropboxapi.com/2/files/get_temporary_link'
+
         headers = {'Authorization': 'Bearer ' + self._access_token, 'Content-Type': 'application/json'}
+
         data = {"path": file_path}
+
         data_encoded = json.dumps(data)
+
         erantzuna = requests.post(uria, headers=headers, data=data_encoded, allow_redirects=False)
+
         response = json.loads(erantzuna.content)
         status = erantzuna.status_code
         edukia = erantzuna.text
         url = response["link"]
+
         print(url)
         webbrowser.open(url)
+
         print("Status: ")
         print(str(status))
+
         print("Edukia: ")
         print(edukia)

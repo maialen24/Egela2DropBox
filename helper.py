@@ -8,10 +8,12 @@ def center(win):
     frm_width = win.winfo_rootx() - win.winfo_x()
     win_width = width + 2 * frm_width
     height = win.winfo_height()
+
     titlebar_height = win.winfo_rooty() - win.winfo_y()
     win_height = height + titlebar_height + frm_width
     x = win.winfo_screenwidth() // 2 - win_width // 2
     y = win.winfo_screenheight() // 2 - win_height // 2
+
     win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
     win.deiconify()
     win.update_idletasks()
@@ -22,6 +24,7 @@ def progress(tipo, title):
         popup = tk.Tk()
     else:
         popup = tk.Toplevel()
+
     popup.geometry('250x50')
     popup.title(title)
     popup.tk.call('wm', 'iconphoto', popup._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
@@ -45,12 +48,14 @@ def update_listbox2(msg_listbox, path, edukia_json):
     msg_listbox.delete(0, tk.END)
 
     files = []
+
     if path != '/':
         files.append({'id': 'parent',
                       'name': "..",
                       '.tag': "folder"})
         msg_listbox.insert(tk.END, "..")
         msg_listbox.itemconfigure(tk.END, background="red")
+
     for each in edukia_json['entries']:
         msg_listbox.insert(tk.END, each['name'])
         if each['.tag'] == "folder":

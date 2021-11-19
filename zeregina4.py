@@ -85,6 +85,7 @@ def name_folder(folder_name):
         dropbox._path = dropbox._path + folder_name
     else:
         dropbox._path = dropbox._path + '/' + folder_name
+
     dropbox.create_folder(dropbox._path)
     var.set(dropbox._path)
     dropbox._root.destroy()
@@ -132,6 +133,7 @@ def on_selecting2(event):
 def on_double_clicking2(event):
     widget = event.widget
     selection = widget.curselection()
+
     if selection[0] == 0 and dropbox._path != "/":
         head, tail = os.path.split(dropbox._path)
         dropbox._path = head
@@ -142,6 +144,7 @@ def on_double_clicking2(event):
                 dropbox._path = dropbox._path + selected_file['name']
             else:
                 dropbox._path = dropbox._path + '/' + selected_file['name']
+
     var.set(dropbox._path)
     dropbox.list_folder(msg_listbox2)
 

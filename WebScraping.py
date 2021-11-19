@@ -22,16 +22,20 @@ def lortuhtml(uria,cookie):
 def eskaerak():
     metodoa = 'GET'
     uria = "https://egela.ehu.eus"
+
     goiburuak = {'Host': 'egela.ehu.eus',
                  'Content-Type': 'application/x-www-form-urlencoded'}
+
     erantzuna = requests.request(metodoa, uria,
                                  headers=goiburuak, allow_redirects=False)
+
     kodea = erantzuna.status_code
     deskribapena = erantzuna.reason
 
     #ESKAERA ETA ERANTZUNAK INPRIMATU
     print("ESKAERA:")
     print(metodoa +' '+ uria)
+
     print("ERANTZUNA:")
     print(str(kodea) + " " + deskribapena)
     print(erantzuna.headers)
@@ -43,14 +47,17 @@ def eskaerak():
     metodoa = 'GET'
     uria = nora
     goiburuak = {}
+
     erantzuna = requests.request(metodoa, uria,
                                  headers=goiburuak, allow_redirects=False)
+
     kodea = erantzuna.status_code
     deskribapena = erantzuna.reason
 
     # ESKAERA ETA ERANTZUNAK INPRIMATU
     print("ESKAERA")
     print(metodoa+' '+uria)
+
     print("ERANTZUNA")
     print(str(kodea) + " " + deskribapena)
     print(erantzuna.headers)
@@ -70,14 +77,17 @@ def eskaerak():
     edukia={'username' : erabiltzailea, 'password' : pasahitza}
     edukia_encoded = urllib.parse.urlencode(edukia)
     goiburuak['Content-Length'] = str(len(edukia_encoded))
+
     erantzuna = requests.request(metodoa, uria, data=edukia_encoded,
                                  headers=goiburuak, allow_redirects=False)
+
     kodea = erantzuna.status_code
     deskribapena = erantzuna.reason
 
     # ESKAERA ETA ERANTZUNAK INPRIMATU
     print("ESKAERA")
     print(metodoa +' '+ uria)
+
     print("ERANTZUNA")
     print(str(kodea) + " " + deskribapena)
     edukia = erantzuna.content
@@ -90,12 +100,15 @@ def eskaerak():
     metodoa = 'GET'
     uria= nora
     goiburuak={'Cookie':cookie}
+
     erantzuna = requests.request(metodoa, uria,
                                  headers=goiburuak, allow_redirects=False)
+
     kodea = erantzuna.status_code
     deskribapena = erantzuna.reason
     print("ESKAERA")
     print(metodoa+ ' '+uria)
+
     print("ERANTZUNA")
     print(str(kodea) + " " + deskribapena)
     edukia = erantzuna.content
@@ -105,14 +118,17 @@ def eskaerak():
     metodoa = 'GET'
     uria = nora
     goiburuak = {'Cookie': cookie}
+
     erantzuna = requests.request(metodoa, uria,
                                  headers=goiburuak, allow_redirects=False)
+
     kodea = erantzuna.status_code
     deskribapena = erantzuna.reason
 
     #ESKAERA ETA ERANTZUNA INPRIMATU
     print("ESKAERA")
     print(metodoa+ ' '+ uria)
+
     print("ERANTZUNA")
     print(str(kodea) + " " + deskribapena)
     edukia = erantzuna.content
@@ -141,13 +157,16 @@ def eskaerak():
 
     soup= BeautifulSoup(edukia, "html.parser")
     print(len(soup.find_all('a','href',class_="")))
+
     #lortu esteka guztiak
     for link in soup.find_all('a','href',class_=""):
      link=(link['href'])
+
      #lortu pdf-ak dituztenak
      if(link.startswith('https://egela.ehu.eus/mod/resource')):
       e = lortuhtml(link, cookie)
       s = BeautifulSoup(e, "html.parser")
+
       for l in s.select("a[href$='.pdf']"):
        current_link=l.get('href')
        izena = current_link.replace(':', '_')
