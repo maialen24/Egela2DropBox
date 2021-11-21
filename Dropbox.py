@@ -89,6 +89,29 @@ class Dropbox:
         self._access_token = access_token
         self._root.destroy()
 
+    def list_files(self,files):
+        print("/list_folder")
+        uri = "https://api.dropboxapi.com/2/file_requests/list_v2"
+        if self._path == '/':
+            path = ""
+        else:
+            path = self._path
+        datuak = {'path': path, "recursive": False, "include_media_info": False, "include_deleted": False,
+                  "include_has_explicit_shared_members": False, "include_mounted_folders": True,
+                  "include_non_downloadable_files": True}
+        datuak_encoded = json.dumps(datuak)
+        goiburuak = {'Host': 'api.dropboxapi.com', 'Authorization': 'Bearer ' + self._access_token,
+                     'Content-Type': 'application/json'}
+        erantzuna = requests.post(uri, headers=goiburuak, data=datuak_encoded, allow_redirects=False)
+        status = erantzuna.status_code
+        edukia = erantzuna.text
+        print("Status: ")
+        print(str(status))
+        print("Edukia: ")
+        print(edukia)
+        edukia_json_dict = json.loads(edukia)
+
+        self._files = helper.update_listbox2(files, self._path, edukia_json_dict)
     def list_folder(self, msg_listbox):
         print("/list_folder")
         uri = "https://api.dropboxapi.com/2/files/list_folder"

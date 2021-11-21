@@ -16,7 +16,7 @@ class eGela:
     def __init__(self, root):
         self._root = root
 
-    def check_credentials(self, username, password, event=None):
+    def check_credentials(self,username,password,event=None):
         popup, progress_var, progress_bar = helper.progress("check_credentials", "Logging into eGela...")
         progress = 0
         progress_var.set(progress)
@@ -33,8 +33,8 @@ class eGela:
         headers = {'Host': 'egela.ehu.eus',
                    'Content-Type': 'application/x-www-form-urlencoded', }
         data = {
-                'username': username.get(),
-                'password': password.get()}
+                'username': username,
+                'password': password}
         data_encoded = urllib.parse.urlencode(data)
         headers['Content-Length'] = str(len(data_encoded))
         erantzuna = requests.request(metodoa, uria, headers=headers, data=data_encoded, allow_redirects=True)

@@ -6,6 +6,15 @@ import helper
 import time
 
 
+
+newroot=tk.Tk()
+dropbox=Dropbox.Dropbox(newroot)
+egela=eGela.eGela(newroot)
+msg_listbox2=tk.Listbox()
+var=tk.StringVar()
+username=tk.Entry()
+password=tk.Entry()
+
 def make_entry(parent, caption, width=None, **options):
     label = tk.Label(parent, text=caption)
     label.pack(side=tk.TOP)
@@ -170,119 +179,216 @@ def download():
     popup.destroy()
     dropbox.list_folder(msg_listbox2)
 
-# Login eGela
-root = tk.Tk()
-root.geometry('250x150')
-root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
-#root.iconbitmap('logoEgela2Dropbox.png')
-root.title('Login eGela')
-helper.center(root)
-egela = eGela.eGela(root)
+def toDropbox(lista):
+    # Login Dropbox
+    root = tk.Tk()
+    root.geometry('800x700')
+    # root.iconbitmap('./logoEgela2Dropbox.ico')
+    # root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
+    root.title('Login Dropbox')
+    helper.center(root)
 
-login_frame = tk.Frame(root, padx=10, pady=10)
-login_frame.pack(fill=tk.BOTH, expand=True)
+    login_frame = tk.Frame(root, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+    # Login and Authorize in Drobpox
+    dropbox = Dropbox.Dropbox(root)
 
-username = make_entry(login_frame, "Username:", 16)
-password = make_entry(login_frame, "Password:", 16, show="*")
-password.bind("<Return>", check_credentials)
+    label = tk.Label(login_frame, text="Login and Authorize\nin Drobpox")
+    label.pack(side=tk.TOP)
+    button = tk.Button(login_frame, borderwidth=4, text="Login", width=10, pady=8, command=dropbox.do_oauth)
+    button.pack(side=tk.BOTTOM)
 
-button = tk.Button(login_frame, borderwidth=4, text="Login", width=10, pady=8, command=check_credentials)
-button.pack(side=tk.BOTTOM)
+    root.mainloop()
 
-root.mainloop()
+    # eGela -> Dropbox
 
-if not egela._login:
-    exit()
-# eGela-ko PDF-etako erreferentziak hartu
-pdfs = egela.get_pdf_refs()
+    newroot = tk.Tk()
+    newroot.geometry("850x400")
+    # newroot.iconbitmap('./favicon.ico')
+    # newroot.tk.call('wm', 'iconphoto', newroot._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
+    newroot.title("eGela -> Dropbox")
+    helper.center(newroot)
 
-# Login Dropbox
-root = tk.Tk()
-root.geometry('800x700')
-#root.iconbitmap('./logoEgela2Dropbox.ico')
-root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
-root.title('Login Dropbox')
-helper.center(root)
+    newroot.rowconfigure(0, weight=1)
+    newroot.rowconfigure(1, weight=5)
+    newroot.columnconfigure(0, weight=6)
+    newroot.columnconfigure(1, weight=1)
+    newroot.columnconfigure(2, weight=6)
+    newroot.columnconfigure(3, weight=1)
 
-login_frame = tk.Frame(root, padx=10, pady=10)
-login_frame.pack(fill=tk.BOTH, expand=True)
-# Login and Authorize in Drobpox
-dropbox = Dropbox.Dropbox(root)
+    # PDF-zerrendaren etiketa(0,0)   #
+    var2 = tk.StringVar()
+    var2.set("PDF")
+    label2 = tk.Label(newroot, textvariable=var2)
+    label2.grid(column=0, row=0, ipadx=5, ipady=5)
 
-label = tk.Label(login_frame, text="Login and Authorize\nin Drobpox")
-label.pack(side=tk.TOP)
-button = tk.Button(login_frame, borderwidth=4, text="Login", width=10, pady=8, command=dropbox.do_oauth)
-button.pack(side=tk.BOTTOM)
+    # Dropbox fitxategien zerrendaren etiketa (0,2)
+    var = tk.StringVar()
+    var.set("Dropbox path: " + dropbox._path)
+    label = tk.Label(newroot, textvariable=var)
+    label.grid(row=0, column=2, ipadx=5, ipady=5)
 
-root.mainloop()
+    # PDF-en zerrenda duen Frame-a(1,0)
+    selected_items1 = None
+    messages_frame1 = tk.Frame(newroot)
+    msg_listbox1 = make_listbox(messages_frame1)
+    msg_listbox1.bind('<<ListboxSelect>>', on_selecting1)
+    msg_listbox1.pack(side=tk.LEFT, fill=tk.BOTH)
+    # messages_frame1.pack()
+    messages_frame1.grid(row=1, column=0, ipadx=10, ipady=2, padx=2, pady=2)
 
-# eGela -> Dropbox
+    # Frame >>> botoiarekin (1,1)
+    frame1 = tk.Frame(newroot)
+    button1 = tk.Button(frame1, borderwidth=4, text=">>>", width=10, pady=8, command=transfer_files)
+    button1.pack()
+    frame1.grid(row=1, column=1, ipadx=5, ipady=5)
 
-newroot = tk.Tk()
-newroot.geometry("850x400")
-#newroot.iconbitmap('./favicon.ico')
-newroot.tk.call('wm', 'iconphoto', newroot._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
-newroot.title("eGela -> Dropbox")
-helper.center(newroot)
+    # Dropbox fitxategien zerrenda duen Frame-a (1,2)
+    selected_items2 = None
+    messages_frame2 = tk.Frame(newroot)
+    msg_listbox2 = make_listbox(messages_frame2)
+    msg_listbox2.bind('<<ListboxSelect>>', on_selecting2)
+    msg_listbox2.bind('<Double-Button-1>', on_double_clicking2)
+    msg_listbox2.pack(side=tk.RIGHT, fill=tk.BOTH)
+    # messages_frame2.pack()
+    messages_frame2.grid(row=1, column=2, ipadx=10, ipady=2, padx=2, pady=2)
 
-newroot.rowconfigure(0, weight=1)
-newroot.rowconfigure(1, weight=5)
-newroot.columnconfigure(0, weight=6)
-newroot.columnconfigure(1, weight=1)
-newroot.columnconfigure(2, weight=6)
-newroot.columnconfigure(3, weight=1)
+    # Sortu eta ezabatu botoia duen Frame-a  (1,3)
+    frame2 = tk.Frame(newroot)
+    button2 = tk.Button(frame2, borderwidth=4, text="Delete", width=10, pady=8, command=delete_files)
+    button2.pack(padx=2, pady=2)
+    button3 = tk.Button(frame2, borderwidth=4, text="Create folder", width=10, pady=8, command=create_folder)
+    button3.pack(padx=2, pady=2)
+    button4 = tk.Button(frame2, borderwidth=4, text="Download", width=10, pady=8, command=download)
+    button4.pack(padx=2, pady=2)
+    frame2.grid(column=3, row=1, ipadx=10, ipady=10)
 
-# PDF-zerrendaren etiketa(0,0)   #
-var2 = tk.StringVar()
-var2.set("PDF-ak Web Sistemak ikastaroan")
-label2 = tk.Label(newroot, textvariable=var2)
-label2.grid(column=0, row=0, ipadx=5, ipady=5)
+    for each in lista:
+        msg_listbox1.insert(tk.END, each['pdf_name'])
+        msg_listbox1.yview(tk.END)
 
-# Dropbox fitxategien zerrendaren etiketa (0,2)
-var = tk.StringVar()
-var.set("Dropbox path: " + dropbox._path)
-label = tk.Label(newroot, textvariable=var)
-label.grid(row=0, column=2, ipadx=5, ipady=5)
+    dropbox.list_folder(msg_listbox2)
 
-# PDF-en zerrenda duen Frame-a(1,0)
-selected_items1 = None
-messages_frame1 = tk.Frame(newroot)
-msg_listbox1 = make_listbox(messages_frame1)
-msg_listbox1.bind('<<ListboxSelect>>', on_selecting1)
-msg_listbox1.pack(side=tk.LEFT, fill=tk.BOTH)
-# messages_frame1.pack()
-messages_frame1.grid(row=1, column=0, ipadx=10, ipady=2, padx=2, pady=2)
+    newroot.mainloop()
 
-# Frame >>> botoiarekin (1,1)
-frame1 = tk.Frame(newroot)
-button1 = tk.Button(frame1, borderwidth=4, text=">>>", width=10, pady=8, command=transfer_files)
-button1.pack()
-frame1.grid(row=1, column=1, ipadx=5, ipady=5)
 
-# Dropbox fitxategien zerrenda duen Frame-a (1,2)
-selected_items2 = None
-messages_frame2 = tk.Frame(newroot)
-msg_listbox2 = make_listbox(messages_frame2)
-msg_listbox2.bind('<<ListboxSelect>>', on_selecting2)
-msg_listbox2.bind('<Double-Button-1>', on_double_clicking2)
-msg_listbox2.pack(side=tk.RIGHT, fill=tk.BOTH)
-# messages_frame2.pack()
-messages_frame2.grid(row=1, column=2, ipadx=10, ipady=2, padx=2, pady=2)
+def egela2drop():
 
-# Sortu eta ezabatu botoia duen Frame-a  (1,3)
-frame2 = tk.Frame(newroot)
-button2 = tk.Button(frame2, borderwidth=4, text="Delete", width=10, pady=8, command=delete_files)
-button2.pack(padx=2, pady=2)
-button3 = tk.Button(frame2, borderwidth=4, text="Create folder", width=10, pady=8, command=create_folder)
-button3.pack(padx=2, pady=2)
-button4 = tk.Button(frame2, borderwidth=4, text="Download", width=10, pady=8, command=download)
-button4.pack(padx=2, pady=2)
-frame2.grid(column=3, row=1, ipadx=10, ipady=10)
+    # Login eGela
+    root = tk.Tk()
+    root.geometry('250x150')
+    #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
+    #root.iconbitmap('logoEgela2Dropbox.png')
+    root.title('Login eGela')
+    helper.center(root)
+    egela = eGela.eGela(root)
 
-for each in pdfs:
-    msg_listbox1.insert(tk.END, each['pdf_name'])
-    msg_listbox1.yview(tk.END)
+    login_frame = tk.Frame(root, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
 
-dropbox.list_folder(msg_listbox2)
+    username = make_entry(login_frame, "Username:", 16)
+    password = make_entry(login_frame, "Password:", 16, show="*")
+    password.bind("<Return>", check_credentials())
 
-newroot.mainloop()
+    button = tk.Button(login_frame, borderwidth=4, text="Login", width=10, pady=8, command=check_credentials)
+    button.pack(side=tk.BOTTOM)
+
+    root.mainloop()
+
+    if not egela._login:
+        exit()
+    # eGela-ko PDF-etako erreferentziak hartu
+    pdfs = egela.get_pdf_refs()
+
+    # Login Dropbox
+    root = tk.Tk()
+    root.geometry('800x700')
+    #root.iconbitmap('./logoEgela2Dropbox.ico')
+    #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
+    root.title('Login Dropbox')
+    helper.center(root)
+
+    login_frame = tk.Frame(root, padx=10, pady=10)
+    login_frame.pack(fill=tk.BOTH, expand=True)
+    # Login and Authorize in Drobpox
+    dropbox = Dropbox.Dropbox(root)
+
+    label = tk.Label(login_frame, text="Login and Authorize\nin Drobpox")
+    label.pack(side=tk.TOP)
+    button = tk.Button(login_frame, borderwidth=4, text="Login", width=10, pady=8, command=dropbox.do_oauth)
+    button.pack(side=tk.BOTTOM)
+
+    root.mainloop()
+
+    # eGela -> Dropbox
+
+    newroot = tk.Tk()
+    newroot.geometry("850x400")
+    #newroot.iconbitmap('./favicon.ico')
+    #newroot.tk.call('wm', 'iconphoto', newroot._w, tk.PhotoImage(file='logoEgela2Dropbox.png'))
+    newroot.title("eGela -> Dropbox")
+    helper.center(newroot)
+
+    newroot.rowconfigure(0, weight=1)
+    newroot.rowconfigure(1, weight=5)
+    newroot.columnconfigure(0, weight=6)
+    newroot.columnconfigure(1, weight=1)
+    newroot.columnconfigure(2, weight=6)
+    newroot.columnconfigure(3, weight=1)
+
+    # PDF-zerrendaren etiketa(0,0)   #
+    var2 = tk.StringVar()
+    var2.set("PDF-ak Web Sistemak ikastaroan")
+    label2 = tk.Label(newroot, textvariable=var2)
+    label2.grid(column=0, row=0, ipadx=5, ipady=5)
+
+    # Dropbox fitxategien zerrendaren etiketa (0,2)
+    var = tk.StringVar()
+    var.set("Dropbox path: " + dropbox._path)
+    label = tk.Label(newroot, textvariable=var)
+    label.grid(row=0, column=2, ipadx=5, ipady=5)
+
+    # PDF-en zerrenda duen Frame-a(1,0)
+    selected_items1 = None
+    messages_frame1 = tk.Frame(newroot)
+    msg_listbox1 = make_listbox(messages_frame1)
+    msg_listbox1.bind('<<ListboxSelect>>', on_selecting1)
+    msg_listbox1.pack(side=tk.LEFT, fill=tk.BOTH)
+    # messages_frame1.pack()
+    messages_frame1.grid(row=1, column=0, ipadx=10, ipady=2, padx=2, pady=2)
+
+    # Frame >>> botoiarekin (1,1)
+    frame1 = tk.Frame(newroot)
+    button1 = tk.Button(frame1, borderwidth=4, text=">>>", width=10, pady=8, command=transfer_files)
+    button1.pack()
+    frame1.grid(row=1, column=1, ipadx=5, ipady=5)
+
+    # Dropbox fitxategien zerrenda duen Frame-a (1,2)
+    selected_items2 = None
+    messages_frame2 = tk.Frame(newroot)
+    msg_listbox2 = make_listbox(messages_frame2)
+    msg_listbox2.bind('<<ListboxSelect>>', on_selecting2)
+    msg_listbox2.bind('<Double-Button-1>', on_double_clicking2)
+    msg_listbox2.pack(side=tk.RIGHT, fill=tk.BOTH)
+    # messages_frame2.pack()
+    messages_frame2.grid(row=1, column=2, ipadx=10, ipady=2, padx=2, pady=2)
+
+    # Sortu eta ezabatu botoia duen Frame-a  (1,3)
+    frame2 = tk.Frame(newroot)
+    button2 = tk.Button(frame2, borderwidth=4, text="Delete", width=10, pady=8, command=delete_files)
+    button2.pack(padx=2, pady=2)
+    button3 = tk.Button(frame2, borderwidth=4, text="Create folder", width=10, pady=8, command=create_folder)
+    button3.pack(padx=2, pady=2)
+    button4 = tk.Button(frame2, borderwidth=4, text="Download", width=10, pady=8, command=download)
+    button4.pack(padx=2, pady=2)
+    frame2.grid(column=3, row=1, ipadx=10, ipady=10)
+
+    for each in pdfs:
+        msg_listbox1.insert(tk.END, each['pdf_name'])
+        msg_listbox1.yview(tk.END)
+
+    dropbox.list_folder(msg_listbox2)
+
+    newroot.mainloop()
+
+

@@ -1,39 +1,25 @@
-from cffi.setuptools_ext import execfile
-from kivy.app import App
-from functools import partial
-from kivy.uix.button import Button
-from kivy.uix.widget import Widget
-
-from kivy.properties import NumericProperty, ReferenceListProperty, \
- \
-    ObjectProperty
-
-from kivy.vector import Vector
-
-from kivy.clock import Clock
-from kivy.uix.label import Label
-from urllib import request
-from bs4 import BeautifulSoup
-import re
 from tkinter import *
 from PIL import ImageTk, Image
+from cffi.setuptools_ext import execfile
+
 import OptionWindows
-
-
+import zeregina4
 
 window = Tk()
 
 window.title("Welcome to Egela2DropBox")
 
-window.geometry('350x200')
+window.geometry('450x400')
 path='./logoEgela2Dropbox.png'
 #Creates a Tkinter-compatible photo image, which can be used everywhere Tkinter expects an image object.
-img = ImageTk.PhotoImage(Image.open(path))
+#img = ImageTk.PhotoImage(Image.open(path))
 
 #The Label widget is a standard Tkinter widget used to display a text or image on the screen.
-label = Label(window, image = img)
+label = Label(window)
 label.grid(column=20, row=0)
 
+titulo= Label(window, text='Egela2DropBox',font=("Arial Bold", 50))
+titulo.grid(column=200,row=0)
 #lbl = Label(window, text="Egela2DropBox")
 
 #lbl.grid(column=0, row=0)
@@ -43,32 +29,27 @@ txt = ''
 #txt.grid(column=1, row=0)
 
 def clickedEgela():
-    #execfile("zeregina4.py")
-    print()
+    zeregina4.egela2drop()
+    #exec(open("./zeregina4.py").read())
+
+   # execfile("zeregina4.py")
+    #print()
 
 
 
-btnEgela = Button(window, text="Egela", command=clickedEgela)
-btnEgela.grid(column=5, row=2)
-
-def clickedDropbox():
-
-    res = "Welcome to " + txt.get()
+btnEgela = Button(window, text="Egela", height = 5, width = 10,command=clickedEgela)
+btnEgela.grid(column=200, row=8)
 
 
-
-btnDropBox= Button(window, text="DropBox", command=clickedDropbox)
-
-btnDropBox.grid(column=5, row=4)
 
 def clickedGetfitx():
 
-    res = "Welcome to " + txt.get()
+    OptionWindows.allFiles()
 
 
-btnGetfitx= Button(window, text="Get files", command=clickedGetfitx)
+btnGetfitx= Button(window, text="Get files",height = 5, width = 10, command=clickedGetfitx)
 
-btnGetfitx.grid(column=5, row=6)
+btnGetfitx.grid(column=200, row=12)
 
 def clickedWeb2html():
 
@@ -76,9 +57,9 @@ def clickedWeb2html():
 
 
 
-btnWeb2html= Button(window, text="Web to pdf", command=clickedWeb2html)
+btnWeb2html= Button(window, text="Web to pdf",height = 5, width = 10, command=clickedWeb2html)
 
-btnWeb2html.grid(column=5, row=8)
+btnWeb2html.grid(column=200, row=14)
 
 
 
